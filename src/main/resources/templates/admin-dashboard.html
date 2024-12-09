@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #f76c6c;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        .container {
+            margin: 2rem auto;
+            max-width: 1200px;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        .stat-box {
+            background-color: #f76c6c;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 30%;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        .table-container {
+            margin-top: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        th, td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f76c6c;
+            color: white;
+        }
+        .edit-button, .delete-button, .add-button {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .edit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+        }
+        .add-button {
+            background-color: #007BFF;
+            color: white;
+            margin-bottom: 1rem;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .add-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Admin Dashboard</h1>
+</div>
+<div class="container">
+    <div class="stats">
+        <div class="stat-box" th:text="'Total Users: ' + ${totalUsers}">Total Users: 6</div>
+        <div class="stat-box" th:text="'Total Books: ' + ${totalBooks}">Total Books: 6</div>
+        <div class="stat-box" th:text="'Books Lent Out: ' + ${booksLentOut}">Books Lent Out: 2</div>
+    </div>
+
+    <!-- Add New User Button -->
+    <a href="/admin/newUser" class="add-button">Add New User</a>
+
+    <h2>Users Table</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}">1</td>
+                <td th:text="${user.username}">John Doe</td>
+                <td th:text="${user.email}">john@example.com</td>
+                <td th:text="${user.role.roleName}">Admin</td>
+                <td>
+                    <form th:action="@{'/admin/editUser/' + ${user.id}}" method="get" th:object="${user}">
+                        <button type="submit" class="edit-button">Edit</button>
+                    </form>
+
+                    <form th:action="@{'/admin/deleteUser/' + ${user.id}}" method="post" th:object="${user}">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add New Book Button -->
+    <a href="/admin/newBook" class="add-button">Add New Book</a>
+
+    <h2>Books Table</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Available Copies</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.id}">1</td>
+                <td th:text="${book.title}">Book Title</td>
+                <td th:text="${book.author}">Author Name</td>
+                <td th:text="${book.isbn}">1234567890</td>
+                <td th:text="${book.availableCopies}">5</td>
+                <td>
+                    <form th:action="@{'/admin/editBook/' + ${book.id}}" method="get" th:object="${book}">
+                        <button type="submit" class="edit-button">Edit</button>
+                    </form>
+
+                    <form th:action="@{'/admin/deleteBook/' + ${book.id}}" method="post" th:object="${book}">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <h2>Transactions Table</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Book</th>
+                <th>Action</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="transaction : ${transactions}">
+                <td th:text="${transaction.id}"></td>
+                <td th:text="${transaction.user.username}"></td>
+                <td th:text="${transaction.book.title}"></td>
+                <td th:text="${transaction.action}"></td>
+                <td th:text="${#dates.format(transaction.date, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <form th:action="@{'/admin/deleteTransaction/' + ${transaction.id}}" method="post">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
